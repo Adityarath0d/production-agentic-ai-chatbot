@@ -1,0 +1,47 @@
+# Python bytecode and test/type-check caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.logfire/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Local environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Local databases and application runtime data
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Streamlit local secrets/config
+.streamlit/secrets.toml
+
+# Logs and generated files
+*.log
+*.tmp
+*.swp
+
+# Build and packaging output
+build/
+dist/
+*.egg-info/
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,35 @@
+[project]
+name = "agentic-chatbot"
+version = "0.1.0"
+description = "Production-grade agentic AI chatbot"
+requires-python = ">=3.11"
+
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic-settings>=2.6",
+    "python-dotenv>=1.0",
+    "langgraph>=1.2.12",
+    "langchain>=1.4.2",
+    "langchain-google-genai>=4.4.0",
+    "langgraph-checkpoint-sqlite>=3.1.1",
+    "logfire[system-metrics]>=5.1.0",
+    "sqlalchemy[asyncio]>=2.1.1",
+    "aiosqlite>=0.22.1",
+    "alembic>=1.20.0",
+]
+
+# Observability 
+[project.optional-dependencies] 
+
+observability = [
+    "logfire[fastapi]",
+    "logfire-api",
+]
+
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+    "ruff>=0.7",
+]
