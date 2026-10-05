@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import ColumnElement, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Thread, utcnow
+from app.models import Thread, utcnow, DEFAULT_TITLE
 
 
 def _owned_by(user_id: str | None) -> ColumnElement[bool]:
@@ -15,7 +15,7 @@ def _owned_by(user_id: str | None) -> ColumnElement[bool]:
 
 
 async def create_thread(
-    session: AsyncSession, user_id: str | None = None, title: str = "New chat"
+    session: AsyncSession, user_id: str | None = None, title: str = DEFAULT_TITLE
 ) -> Thread:
     thread = Thread(id=str(uuid.uuid4()), title=title, user_id=user_id)
     session.add(thread)

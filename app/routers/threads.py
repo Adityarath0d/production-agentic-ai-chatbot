@@ -8,6 +8,7 @@ from app.db import get_session
 from langchain_core.messages import AIMessage, HumanMessage
 
 from app.schema import ThreadRename
+from app.utils import message_text
 
 router = APIRouter(prefix="/threads")
 
@@ -18,6 +19,14 @@ def message_text(content) -> str:
     return "".join(b.get("text", "") for b in content if isinstance(b, dict))
 
 #----------------- API endpoints -----------------
+@router.get("")
+async def list_threads(session: AsyncSession = Depends(get_session)):
+    threads = await repo.list_threads(session)
+    return [
+        {"id": t.id, "title": t.title, "updated_at": t.updated_at}
+        for t in threads
+    ]
+
 @router.get("/{thread_id}")
 async def get_thread(thread_id: str, session: AsyncSession = Depends(get_session)):
     thread = await repo.get_thread(session, thread_id)

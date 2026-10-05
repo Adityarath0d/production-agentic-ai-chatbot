@@ -3,8 +3,13 @@ from dotenv import load_dotenv
 from app import deps
 load_dotenv()
 
+from starlette.background import BackgroundTask
+from app.tasks import set_title_if_new
+
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
+from fastapi import Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 from contextlib import asynccontextmanager, AsyncExitStack
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from app.agent.graph import build_graph
@@ -13,6 +18,8 @@ from app.tools import weather
 
 from app.db import engine
 from app.routers.threads import router as threads_router
+from app import repository as repo
+from app.db import get_session
 
 import logfire
 import json
@@ -57,20 +64,16 @@ async def health():
         "graph_exists": hasattr(app.state, "graph") and app.state.graph is not None,
     }
 
-
-@app.post("/chat")
-async def chat(request: ChatRequest):
-    CONFIG = {"configurable": {"thread_id": request.thread_id}}
-
-    response = await app.state.graph.ainvoke(
-        {"messages": [("user", request.message)]}, config=CONFIG
-    )
-
-    return {"response": response["messages"][-1].content[0]["text"]}
-
-
 @app.post("/chat/stream")
-async def chat_stream(request: ChatRequest):
+async def chat_stream(request: ChatRequest, session: AsyncSession = Depends(get_session)):
+    thread = await repo.get_thread(session, request.thread_id)
+
+    if thread is None:
+        raise HTTPException(status_code=404, detail="Thread not found")
+
+    await repo.touch_thread(session, request.thread_id)  # Update last_accessed timestamp
+
+
     CONFIG = {"configurable": {"thread_id": request.thread_id}}
 
     async def event_generator():
@@ -94,4 +97,10 @@ async def chat_stream(request: ChatRequest):
             elif isinstance(content, str) and content:
                 yield f"data: {json.dumps({'content': content})}\n\n"
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    return StreamingResponse(
+    event_generator(),
+    media_type="text/event-stream",
+    background=BackgroundTask(
+        set_title_if_new, request.thread_id, request.message
+    ),
+)
