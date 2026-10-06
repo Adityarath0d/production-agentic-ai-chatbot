@@ -1,6 +1,6 @@
 import httpx
-from pydantic import BaseModel, Field
 from langchain_core.tools import tool
+from pydantic import BaseModel, Field
 
 http_client: httpx.AsyncClient | None = None  # set by lifespan at startup
 

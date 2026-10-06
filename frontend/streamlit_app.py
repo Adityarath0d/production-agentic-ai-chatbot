@@ -1,6 +1,6 @@
 import json
-from itertools import chain
 import time
+from itertools import chain
 
 import requests
 import streamlit as st

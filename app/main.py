@@ -1,29 +1,26 @@
 from dotenv import load_dotenv
 
-from app import deps
 load_dotenv()
 
-from starlette.background import BackgroundTask
-from app.tasks import set_title_if_new
+import json
+from contextlib import AsyncExitStack, asynccontextmanager
 
-from fastapi import FastAPI
+import httpx
+import logfire
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
-from fastapi import Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from contextlib import asynccontextmanager, AsyncExitStack
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.background import BackgroundTask
+
+from app import repository as repo
 from app.agent.graph import build_graph
+from app.db import engine, get_session
+from app.routers.threads import router as threads_router
 from app.schema import ChatRequest
+from app.tasks import set_title_if_new
 from app.tools import weather
 
-from app.db import engine
-from app.routers.threads import router as threads_router
-from app import repository as repo
-from app.db import get_session
-
-import logfire
-import json
-import httpx
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

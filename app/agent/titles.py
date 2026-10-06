@@ -30,6 +30,6 @@ async def generate_title(message: str) -> str:
         if not title:
             return fallback_title(message)
         return title[:60]
-    except Exception:
+    except Exception: # noqa: BLE001 - titles are optional, so any failure falls back
         # Titles are optional. Any failure falls back, and chat never breaks.
         return fallback_title(message)

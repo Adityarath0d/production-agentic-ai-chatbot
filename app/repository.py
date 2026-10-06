@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import ColumnElement, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Thread, utcnow, DEFAULT_TITLE
+from app.models import DEFAULT_TITLE, Thread, utcnow
 
 
 def _owned_by(user_id: str | None) -> ColumnElement[bool]:

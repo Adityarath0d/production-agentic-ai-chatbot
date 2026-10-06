@@ -1,22 +1,14 @@
-from ast import If
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from langchain_core.messages import AIMessage, HumanMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import repository as repo
 from app.db import get_session
-from langchain_core.messages import AIMessage, HumanMessage
-
 from app.schema import ThreadRename
 from app.utils import message_text
 
 router = APIRouter(prefix="/threads")
-
-#--------------- Helper functions -----------------
-def message_text(content) -> str:
-    if isinstance(content, str):
-        return content
-    return "".join(b.get("text", "") for b in content if isinstance(b, dict))
 
 #----------------- API endpoints -----------------
 @router.get("")
